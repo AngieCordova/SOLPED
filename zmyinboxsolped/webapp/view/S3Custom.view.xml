@@ -1,0 +1,808 @@
+<!--
+    Copyright (C) 2009-2023 SAP SE or an SAP affiliate company. All rights reserved.
+-->
+<mvc:View
+    controllerName="cross.fnd.fiori.inbox.view.S3"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout"
+    xmlns:sap.ca.ui="sap.ca.ui"
+    xmlns:suite="sap.suite.ui.commons"
+>
+    <Page id="mainPage">
+        <headerContent>
+        </headerContent>
+        <layout:DynamicSideContent
+            id="DynamicSideContent"
+            class="sapUiDSCExplored"
+            sideContentFallDown="BelowM"
+            containerQuery="true"
+            sideContentVisibility="ShowAboveS"
+            showSideContent="false"
+            breakpointChanged="updateToggleButtonState"
+        >
+            <layout:mainContent>
+                <core:ComponentContainer
+                    id="genericComponentContainer"
+                    height="100%"
+                    visible="{= ${detail>/showGenericComponent}}"
+                    propagateModel="{
+                        path: 'detail>/showGenericComponent',
+                        formatter: '.Conversions.formatterPropagateModel'
+                    }"
+                />
+                <layout:FixFlex
+                    id="fioriElementsContainer"
+                    visible="{= ${detail>/embedFioriElements}}"
+                />
+                <!-- Extends the header section -->
+                <core:ExtensionPoint name="CustomerExtensionForObjectHeader">
+                    <ObjectHeader
+                        backgroundDesign="{
+                            path: 'detail>/SapUiTheme',
+                            formatter: '.Conversions.formatterThemeBasedBackgroundColor'
+                        }"
+                        title="{
+                            parts: [{
+                                path: 'detail>/TaskTitle'
+                            }, {
+                                path: 'detail>/CustomAttributeData'
+                            }],
+                            formatter: '.Conversions.formatterTaskTitle'
+                        }"
+                        titleLevel="H3"
+                        number="{
+                            path: 'detail>/CustomAttributeData',
+                            formatter: '.Conversions.formatterCustomNumberValue'
+                        }"
+                        numberUnit="{
+                            path: 'detail>/CustomAttributeData',
+                            formatter: '.Conversions.formatterCustomNumberUnitValue'
+                        }"
+                        visible="{= ${detail>/showDefaultView}}"
+                    >
+                        <attributes>
+                            <ObjectAttribute
+                                id="ARuserName"
+                                text="{
+                                    parts: [{
+                                        path: 'CreatedByName'
+                                    }, {
+                                        path: 'CustomAttributeData'
+                                    }],
+                                    formatter: '.Conversions.formatterCreatedBy'
+                                }"
+                                active="{
+                                    path: 'CustomAttributeData',
+                                    formatter: '.Conversions.formatterCreatedByLink'
+                                }"
+                                press="onEmployeeLaunchTask"
+                            />
+                            <ObjectAttribute text="{
+                                path: 'detail>/CompletionDeadLine',
+                                formatter: '.Conversions.formatterDueDate'
+                            }" />
+                            <ObjectAttribute text="{
+                                path: 'detail>/CreatedOn',
+                                formatter: '.Conversions.formatterCreatedDate'
+                            }" />
+                            <ObjectAttribute text="{
+                                parts: [{
+                                    path: 'detail>/CompletedOn'
+                                }, {
+                                    path: 'detail>/Status'
+                                }],
+                                formatter: '.Conversions.formatterCompletedDate'
+                            }" />
+                            <ObjectAttribute text="{
+                                parts: [{
+                                    path: 'detail>/ResumeOn'
+                                }, {
+                                    path: 'detail>/Status'
+                                }],
+                                formatter: '.Conversions.formatterResumeOnText'
+                            }" />
+                            <ObjectAttribute text="{
+                                parts: [{
+                                    path: 'detail>/CustomAttributeData'
+                                }, {
+                                    path: 'detail>/CustomAttributeDefinitionData'
+                                }],
+                                formatter: 'cross.fnd.fiori.inbox.view.S3.prototype.Conversions.formatterDetailCustomObjectAttributeValue'
+                            }" />
+                        </attributes>
+                        <firstStatus>
+                            <ObjectStatus
+                                title="{i18n>STATUS_LABEL}"
+                                text="{
+                                    parts: [{
+                                        path: 'detail>/SAP__Origin'
+                                    }, {
+                                        path: 'detail>/Status'
+                                    }],
+                                    formatter: '.Conversions.formatterStatus'
+                                }"
+                            />
+                        </firstStatus>
+                        <secondStatus>
+                            <ObjectStatus
+                                title="{i18n>PRIORITY_LABEL}"
+                                text="{
+                                    parts: [{
+                                        path: 'detail>/SAP__Origin'
+                                    }, {
+                                        path: 'detail>/Priority'
+                                    }],
+                                    formatter: '.Conversions.formatterPriority'
+                                }"
+                                state="{
+                                    path: 'detail>/Priority',
+                                    formatter: '.Conversions.formatterPriorityState'
+                                }"
+                            />
+                        </secondStatus>
+                    </ObjectHeader>
+                </core:ExtensionPoint>
+                <IconTabBar
+                    id="tabBar"
+                    expandable="false"
+                    select="onTabSelect"
+                    visible="{detail>/showDefaultView}"
+                >
+                    <items>
+                        <IconTabFilter
+                            icon="sap-icon://hint"
+                            tooltip="{i18n>comments.tooltip}"
+                            key="DESCRIPTION"
+                            id="DescriptionContent"
+                        >
+                            <!-- Extends the info tab content -->
+                            <core:ExtensionPoint name="CustomerExtensionForInfoTabContent">
+                                <layout:VerticalLayout
+                                    id="infoTabContent"
+                                    class="crossFndFioriInboxDescription"
+                                    visible="{= !!${detail>/Description} }"
+                                >
+                                    <layout:content>
+                                        <core:HTML
+                                            content="{
+                                                path: 'detail>/Description',
+                                                formatter: '.Conversions.formatterHtml'
+                                            }"
+                                            sanitizeContent="true"
+                                        />
+                                    </layout:content>
+                                </layout:VerticalLayout>
+                                <!-- Form for custom attributes -->
+                                <form:Form>
+                                    <form:formContainers>
+                                        <form:FormContainer id="customAttributesContainer" />
+                                    </form:formContainers>
+                                    <form:layout>
+                                        <form:ResponsiveLayout />
+                                    </form:layout>
+                                </form:Form>
+                                <!-- ========== SECCIÓN DE CABECERA DE SOLPED ========== -->
+                                <form:SimpleForm
+                                    editable="false"
+                                    layout="ResponsiveGridLayout"
+                                    labelSpanXL="5"
+                                    labelSpanL="5"
+                                    labelSpanM="5"
+                                    labelSpanS="12"
+                                    columnsXL="1"
+                                    columnsL="1"
+                                    columnsM="1"
+                                >
+                                    <form:content>
+                                        <Label text="Solicitud de pedido" />
+                                        <Text text="{solpedHeader>/ISolped}" />
+                                        <Label text="Texto de cabecera de Solicitud de pedido" />
+                                        <Text text="{solpedHeader>/ETextoCabecera}" />
+                                    </form:content>
+                                </form:SimpleForm>
+                                <core:HTML content="&lt;hr style='margin: 1rem 0; border: none; border-top: 1px solid #e0e0e0;' /&gt;" />
+                                <!-- ========== FIN SECCIÓN DE RESUMEN ========== -->
+                                <!-- ========== POSICIONES DE SOLPED ========== -->
+                                <VBox class="sapUiSmallMargin">
+                                    <Toolbar>
+                                        <Title
+                                            id="posTitle"
+                                            text="Posiciones de Solicitud de Pedido (0)"
+                                            class="sapUiMediumMarginTop sapUiMediumMarginBottom"
+                                            titleStyle="H4"
+                                        />
+                                        <ToolbarSpacer />
+                                        <Text text="{= ${solpedItems>/}.length ? ${solpedItems>/}.length + ' posiciones' : 'Sin posiciones'}" />
+                                    </Toolbar>
+                                    <ScrollContainer
+                                        vertical="false"
+                                        horizontal="true"
+                                        height="auto"
+                                    >
+                                        <Table
+                                            id="tblItems"
+                                            class="sapUiSizeCompact tinyTable"
+                                            items="{solpedItems>/}"
+                                            updateFinished=".onItemsUpdateFinished"
+                                            growing="true"
+                                            growingScrollToLoad="true"
+                                            growingThreshold="20"
+                                            inset="false"
+                                            showSeparators="Inner"
+                                            fixedLayout="true"
+                                        >
+                                            <columns>
+                                                <Column
+                                                    width="6rem"
+                                                    demandPopin="true"
+                                                    minScreenWidth="Desktop"
+                                                >
+                                                    <Text
+                                                        wrapping="false"
+                                                        text="Posición"
+                                                    />
+                                                </Column>
+                                                <Column
+                                                    width="10rem"
+                                                    demandPopin="true"
+                                                    minScreenWidth="Desktop"
+                                                >
+                                                    <Text
+                                                        wrapping="false"
+                                                        text="Número de Material"
+                                                    />
+                                                </Column>
+                                                <Column
+                                                    width="12rem"
+                                                    demandPopin="true"
+                                                    minScreenWidth="Desktop"
+                                                >
+                                                    <Text
+                                                        wrapping="true"
+                                                        text="Texto breve de material"
+                                                    />
+                                                </Column>
+                                                <Column
+                                                    width="9rem"
+                                                    demandPopin="true"
+                                                    minScreenWidth="Desktop"
+                                                >
+                                                    <Text
+                                                        wrapping="true"
+                                                        text="Grupo artículos"
+                                                    />
+                                                </Column>
+                                                <Column
+                                                    width="10rem"
+                                                    demandPopin="true"
+                                                    minScreenWidth="Desktop"
+                                                    popinDisplay="Inline"
+                                                >
+                                                    <Text
+                                                        wrapping="true"
+                                                        text="Centro"
+                                                    />
+                                                </Column>
+                                                <Column
+                                                    width="10rem"
+                                                    demandPopin="true"
+                                                    minScreenWidth="Desktop"
+                                                    popinDisplay="Inline"
+                                                >
+                                                    <Text
+                                                        wrapping="true"
+                                                        text="Unidad de medida"
+                                                    />
+                                                </Column>
+                                                <Column
+                                                    width="9rem"
+                                                    demandPopin="true"
+                                                    minScreenWidth="Desktop"
+                                                    popinDisplay="Inline"
+                                                >
+                                                    <Text
+                                                        wrapping="true"
+                                                        text="Cantidad base"
+                                                    />
+                                                </Column>
+                                                <Column
+                                                    width="6rem"
+                                                    demandPopin="true"
+                                                    minScreenWidth="Desktop"
+                                                    popinDisplay="Inline"
+                                                >
+                                                    <Text
+                                                        wrapping="true"
+                                                        text="Moneda"
+                                                    />
+                                                </Column>
+                                                <Column
+                                                    width="6rem"
+                                                    demandPopin="true"
+                                                    minScreenWidth="Desktop"
+                                                    popinDisplay="Inline"
+                                                >
+                                                    <Text
+                                                        wrapping="true"
+                                                        text="Precio de valoración"
+                                                    />
+                                                </Column>
+                                                <Column
+                                                    width="10rem"
+                                                    demandPopin="true"
+                                                    minScreenWidth="Desktop"
+                                                    popinDisplay="Inline"
+                                                >
+                                                    <Text
+                                                        wrapping="true"
+                                                        text="Cantidad solicitada"
+                                                    />
+                                                </Column>
+                                                <Column
+                                                    width="10rem"
+                                                    demandPopin="true"
+                                                    minScreenWidth="Desktop"
+                                                    popinDisplay="Inline"
+                                                >
+                                                    <Text
+                                                        wrapping="true"
+                                                        text="Valor neto"
+                                                    />
+                                                </Column>
+                                                <Column
+                                                    width="6rem"
+                                                    demandPopin="true"
+                                                    minScreenWidth="Desktop"
+                                                    popinDisplay="Inline"
+                                                >
+                                                    <Text
+                                                        wrapping="true"
+                                                        text="Tipo de posición"
+                                                    />
+                                                </Column>
+                                                <Column
+                                                    width="10rem"
+                                                    demandPopin="true"
+                                                    minScreenWidth="Desktop"
+                                                    popinDisplay="Inline"
+                                                >
+                                                    <Text
+                                                        wrapping="false"
+                                                        text="Tipo de imputación"
+                                                    />
+                                                </Column>
+                                                <Column
+                                                    width="9rem"
+                                                    demandPopin="true"
+                                                    minScreenWidth="Desktop"
+                                                    popinDisplay="Inline"
+                                                >
+                                                    <Text
+                                                        wrapping="true"
+                                                        text="Grupo de compras"
+                                                    />
+                                                </Column>
+                                                <Column
+                                                    width="8rem"
+                                                    demandPopin="true"
+                                                    minScreenWidth="Desktop"
+                                                    popinDisplay="Inline"
+                                                >
+                                                    <Text
+                                                        wrapping="true"
+                                                        text="Nombre del solicitante"
+                                                    />
+                                                </Column>
+                                                <Column
+                                                    width="9rem"
+                                                    demandPopin="true"
+                                                    minScreenWidth="Desktop"
+                                                    popinDisplay="Inline"
+                                                >
+                                                    <Text
+                                                        wrapping="true"
+                                                        text="Creado por"
+                                                    />
+                                                </Column>
+                                                <Column
+                                                    width="9rem"
+                                                    demandPopin="true"
+                                                    minScreenWidth="Desktop"
+                                                    popinDisplay="Inline"
+                                                >
+                                                    <Text
+                                                        wrapping="true"
+                                                        text="Fecha de entrega"
+                                                    />
+                                                </Column>
+                                                
+                                                <Column
+                                                    width="10rem"
+                                                    demandPopin="true"
+                                                    minScreenWidth="Desktop"
+                                                    popinDisplay="Inline"
+                                                >
+                                                    <Text
+                                                        wrapping="true"
+                                                        text="Dirección de entrega"
+                                                    />
+                                                </Column>
+                                            </columns>
+                                            <items>
+                                                <ColumnListItem
+                                                    type="Inactive"
+                                                    vAlign="Middle"
+                                                >
+                                                    <cells>
+                                                        <Text
+                                                            text="{solpedItems>Posicion}"
+                                                            wrapping="false"
+                                                            maxLines="1"
+                                                        />
+                                                        <Text
+                                                            text="{solpedItems>Material}"
+                                                            wrapping="false"
+                                                            maxLines="1"
+                                                            tooltip="{solpedItems>Material}"
+                                                        />
+                                                        <Text
+                                                            text="{solpedItems>TextoMaterial}"
+                                                            wrapping="true"
+                                                            maxLines="6"
+                                                            tooltip="{solpedItems>TextoMaterial}"
+                                                        />
+                                                        <Text
+                                                            text="{solpedItems>GrupoArticulos}"
+                                                            wrapping="false"
+                                                            maxLines="1"
+                                                            tooltip="{solpedItems>GrupoArticulos}"
+                                                        />
+                                                        <Text
+                                                            text="{solpedItems>Centro}"
+                                                            wrapping="true"
+                                                            maxLines="6"
+                                                            tooltip="{solpedItems>Centro}"
+                                                        />
+                                                        <Text
+                                                            text="{solpedItems>UnidadMedida}"
+                                                            wrapping="true"
+                                                            maxLines="6"
+                                                            tooltip="{solpedItems>UnidadMedida}"
+                                                        />
+                                                        <Text
+                                                            text="{solpedItems>CantidadBase}"
+                                                            wrapping="true"
+                                                            maxLines="6"
+                                                            tooltip="{solpedItems>CantidadBase}"
+                                                        />
+                                                        <Text
+                                                            text="{solpedItems>Moneda}"
+                                                            wrapping="false"
+                                                            maxLines="1"
+                                                            tooltip="{solpedItems>Moneda}"
+                                                        />
+                                                        <Text
+                                                            text="{
+                                                                path: 'solpedItems>PrecioValoracion',
+                                                                type: 'sap.ui.model.type.Float',
+                                                                formatOptions: {
+                                                                    groupingEnabled: true,
+                                                                    maxFractionDigits: 2,
+                                                                    minFractionDigits: 2
+                                                                }
+                                                            }"
+                                                            wrapping="false"
+                                                            maxLines="1"
+                                                            tooltip="{
+                                                                path: 'solpedItems>PrecioValoracion',
+                                                                type: 'sap.ui.model.type.Float',
+                                                                formatOptions: {
+                                                                    groupingEnabled: true,
+                                                                    maxFractionDigits: 2,
+                                                                    minFractionDigits: 2
+                                                                }
+                                                            }"
+                                                        />
+                                                        <Text
+                                                            text="{solpedItems>CantidadSolicitada}"
+                                                            wrapping="true"
+                                                            maxLines="3"
+                                                            tooltip="{solpedItems>CantidadSolicitada}"
+                                                        />
+                                                        <Text
+                                                            text="{
+                                                                path: 'solpedItems>ValorNeto',
+                                                                type: 'sap.ui.model.type.Float',
+                                                                formatOptions: {
+                                                                    groupingEnabled: true,
+                                                                    maxFractionDigits: 2,
+                                                                    minFractionDigits: 2
+                                                                }
+                                                            }"
+                                                            textAlign="End"
+                                                            wrapping="false"
+                                                            maxLines="1"
+                                                            tooltip="{
+                                                                path: 'solpedItems>ValorNeto',
+                                                                type: 'sap.ui.model.type.Float',
+                                                                formatOptions: {
+                                                                    groupingEnabled: true,
+                                                                    maxFractionDigits: 2,
+                                                                    minFractionDigits: 2
+                                                                }
+                                                            }"
+                                                        />
+                                                        <Text
+                                                            text="{solpedItems>TipoDePosicion}"
+                                                            wrapping="true"
+                                                            maxLines="3"
+                                                            tooltip="{solpedItems>TipoDePosicion}"
+                                                        />
+                                                        <Text
+                                                            text="{solpedItems>Imputacion}"
+                                                            wrapping="true"
+                                                            maxLines="3"
+                                                            tooltip="{solpedItems>Imputacion}"
+                                                        />
+                                                        <Text
+                                                            text="{solpedItems>Grupocompras}"
+                                                            wrapping="true"
+                                                            maxLines="3"
+                                                            tooltip="{solpedItems>Grupocompras}"
+                                                        />
+                                                        <Text
+                                                            text="{solpedItems>Solicitante}"
+                                                            wrapping="true"
+                                                            maxLines="3"
+                                                            tooltip="{solpedItems>Solicitante}"
+                                                        />
+                                                        <Text
+                                                            text="{solpedItems>CreadoPor}"
+                                                            wrapping="true"
+                                                            maxLines="3"
+                                                            tooltip="{solpedItems>CreadoPor}"
+                                                        />
+                                                       
+                                                        <Text
+                                                            text="{
+                                                                path: 'solpedItems>FechaEntrega',
+                                                                type: 'sap.ui.model.type.Date',
+                                                                formatOptions: {
+                                                                    pattern: 'dd/MM/yyyy'
+                                                                }
+                                                            }"
+                                                            wrapping="false"
+                                                            maxLines="1"
+                                                            tooltip="{
+                                                                path: 'solpedItems>FechaEntrega',
+                                                                type: 'sap.ui.model.type.Date',
+                                                                formatOptions: {
+                                                                    pattern: 'dd/MM/yyyy'
+                                                                }
+                                                            }"
+                                                        />
+                                                        
+                                                        <Text
+                                                            text="{solpedItems>DireccionEntrega}"
+                                                            wrapping="true"
+                                                            maxLines="6"
+                                                            tooltip="{solpedItems>DireccionEntrega}"
+                                                        />
+                                                    </cells>
+                                                </ColumnListItem>
+                                            </items>
+                                        </Table>
+                                    </ScrollContainer>
+                                </VBox>
+                                <!-- ========== FIN SECCIÓN SOLPED ========== -->
+                            </core:ExtensionPoint>
+                        </IconTabFilter>
+                        <IconTabFilter
+                            id="MIBNoteIconTabFilter"
+                            icon="sap-icon://notes"
+                            tooltip="{i18n>notes.tooltip}"
+                            count="{detail>/CommentsCount}"
+                            visible="{
+                                parts: [{
+                                    path: 'detail>/TaskSupports/Comments'
+                                }, {
+                                    path: 'detail>/SupportsComments'
+                                }, {
+                                    path: 'detail>/showComments'
+                                }],
+                                formatter: '.Conversions.formatterSupportsProperty'
+                            }"
+                            key="NOTES"
+                        >
+                            <!-- Extends the note tab content -->
+                            <core:ExtensionPoint name="CustomerExtensionForNoteTabContent">
+                                <core:ComponentContainer
+                                    id="commentsContainer"
+                                    propagateModel="true"
+                                />
+                            </core:ExtensionPoint>
+                        </IconTabFilter>
+                        <IconTabFilter
+                            id="MIBAttachmentIconTabFilter"
+                            icon="sap-icon://attachment"
+                            tooltip="{i18n>attachments.tooltip}"
+                            count="{detail>/AttachmentsCount}"
+                            visible="{
+                                parts: [{
+                                    path: 'detail>/TaskSupports/Attachments'
+                                }, {
+                                    path: 'detail>/SupportsAttachments'
+                                }, {
+                                    path: 'detail>/showAttachments'
+                                }],
+                                formatter: '.Conversions.formatterSupportsProperty'
+                            }"
+                            key="ATTACHMENTS"
+                        >
+                            <!-- Extends the attachments tab content -->
+                            <core:ExtensionPoint name="CustomerExtensionForAttachmentTabContent">
+                                <core:ComponentContainer id="attachmentComponent" />
+                            </core:ExtensionPoint>
+                        </IconTabFilter>
+                        <IconTabFilter
+                            id="MIBObjectLinksTabFilter"
+                            icon="sap-icon://chain-link"
+                            tooltip="{i18n>relatedObjects.tooltip}"
+                            count="{detail>/ObjectLinksCount}"
+                            visible="{
+                                parts: [{
+                                    path: 'detail>/TaskSupports/TaskObject'
+                                }, {
+                                    path: 'detail>/showRelatedObjects'
+                                }],
+                                formatter: '.Conversions.formatterVisibilityOfObjectIconTab'
+                            }"
+                            key="OBJECTLINKS"
+                        >
+                            <core:ExtensionPoint name="CustomerExtensionForObjectLinkTabContent">
+                                <core:Fragment
+                                    fragmentName="cross.fnd.fiori.inbox.frag.ObjectLinks"
+                                    type="XML"
+                                />
+                            </core:ExtensionPoint>
+                        </IconTabFilter>
+                        <!-- Extends the tab bar with additional tabs -->
+                        <core:ExtensionPoint name="CustomerExtensionForAdditionalTabs" />
+                    </items>
+                </IconTabBar>
+                <core:ExtensionPoint name="CustomerExtensionForAdditionalDetails" />
+            </layout:mainContent>
+            <layout:sideContent>
+                <IconTabBar
+                    id="tabBarLogs"
+                    select="onLogTabSelect"
+                    visible="{= ${detail>/ShowLogPressed}}"
+                >
+                    <items>
+                        <IconTabFilter
+                            id="WorkflowLogIconTabFilter"
+                            text="{i18n>XBUT_WORKFLOW_LOG}"
+                            tooltip="{i18n>workflowlog.tooltip}"
+                            visible="{
+                                path: 'detail>/TaskSupports/WorkflowLog',
+                                formatter: '.Conversions.formatterLogTaskSupportsProperty'
+                            }"
+                            key="WORKFLOWLOG"
+                        >
+                            <content>
+                                <suite:Timeline
+                                    id="timelineWorkflowLog"
+                                    showHeaderBar="false"
+                                    enableScroll="false"
+                                    growingThreshold="10"
+                                    sort="false"
+                                />
+                            </content>
+                        </IconTabFilter>
+                        <IconTabFilter
+                            id="TaskLogIconTabFilter"
+                            text="{i18n>XBUT_TASK_LOG}"
+                            tooltip="{i18n>tasklog.tooltip}"
+                            visible="{
+                                path: 'detail>/TaskSupports/ProcessingLogs',
+                                formatter: '.Conversions.formatterLogTaskSupportsProperty'
+                            }"
+                            key="TASKLOG"
+                        >
+                            <content>
+                                <core:ExtensionPoint name="CustomerExtensionForHistoryTabContent">
+                                    <suite:Timeline
+                                        id="timeline"
+                                        showHeaderBar="false"
+                                        enableScroll="false"
+                                        growingThreshold="10"
+                                        sort="false"
+                                    />
+                                </core:ExtensionPoint>
+                            </content>
+                        </IconTabFilter>
+                    </items>
+                </IconTabBar>
+                <IconTabBar
+                    id="tabBarDetails"
+                    expandable="false"
+                    headerMode="Inline"
+                    select="onTabSelect"
+                    visible="{= !${detail>/ShowLogPressed}}"
+                >
+                    <items>
+                        <IconTabFilter
+                            id="DetailsNoteIconTabFilter"
+                            text="{i18n>CommentsLabel}"
+                            tooltip="{i18n>notes.tooltip}"
+                            count="{detail>/CommentsCount}"
+                            visible="{
+                                parts: [{
+                                    path: 'detail>/TaskSupports/Comments'
+                                }, {
+                                    path: 'detail>/SupportsComments'
+                                }],
+                                formatter: '.Conversions.formatterSupportsProperty'
+                            }"
+                            key="NOTES"
+                        >
+                            <core:ComponentContainer
+                                id="commentsContainerInDetails"
+                                propagateModel="true"
+                            />
+                        </IconTabFilter>
+                        <IconTabFilter
+                            id="DetailsAttachmentIconTabFilter"
+                            text="{i18n>AttachmentsLabel}"
+                            tooltip="{i18n>attachments.tooltip}"
+                            count="{detail>/AttachmentsCount}"
+                            visible="{
+                                parts: [{
+                                    path: 'detail>/TaskSupports/Attachments'
+                                }, {
+                                    path: 'detail>/SupportsAttachments'
+                                }],
+                                formatter: '.Conversions.formatterSupportsProperty'
+                            }"
+                            key="ATTACHMENTS"
+                        >
+                            <core:ComponentContainer id="attachmentComponentInDetails" />
+                        </IconTabFilter>
+                        <IconTabFilter
+                            id="DetailsObjectLinksTabFilter"
+                            text="{i18n>RelatedObjectsLabel}"
+                            tooltip="{i18n>relatedObjects.tooltip}"
+                            count="{detail>/ObjectLinksCount}"
+                            visible="{
+                                path: 'detail>/TaskSupports/TaskObject',
+                                formatter: '.Conversions.formatterVisibilityOfObjectIconTab'
+                            }"
+                            key="OBJECTLINKS"
+                        >
+                            <core:Fragment
+                                fragmentName="cross.fnd.fiori.inbox.frag.ObjectLinks"
+                                type="XML"
+                            />
+                        </IconTabFilter>
+                    </items>
+                </IconTabBar>
+                <!-- End of Side content -->
+                <cust:InvisibleControl
+                    xmlns:cust="cross.fnd.fiori.inbox.util"
+                    id="InvisibleTabStop"
+                    ariaLabelledBy="ACC_Text"
+                />
+                <core:InvisibleText
+                    id="ACC_Text"
+                    text="{i18n>SIDE_CONTENT_END_INFO}"
+                />
+            </layout:sideContent>
+        </layout:DynamicSideContent>
+        <footer>
+            <Bar />
+        </footer>
+    </Page>
+</mvc:View>

@@ -1,0 +1,33 @@
+{
+  "name": "customer.zmyinboxsolped",
+  "version": "0.0.1",
+  "description": "",
+  "devDependencies": {
+    "@sap/ui5-builder-webide-extension": "1.0.x",
+    "@ui5/cli": "^3.0.0",
+    "@sap/ux-ui5-tooling": "1",
+    "rimraf": "3.0.2"
+  },
+  "scripts": {
+    "build_old": "ui5 build --clean-dest --include-task=generateManifestBundle generateCachebusterInfo",
+    "start": "fiori run --open \"index.html?sap-client=110&sap-ui-xx-viewCache=false#title-display\"",
+    "build": "ui5 build -a --clean-dest --include-task=generateCachebusterInfo",
+    "deploy": "npm run build && fiori deploy --config ui5-deploy.yaml",
+    "deploy-config": "fiori add deploy-config",
+    "undeploy": "npm run build && fiori undeploy --config ui5-deploy.yaml",
+    "deploy-test": "npm run build && fiori deploy --config ui5-deploy.yaml --testMode true"
+  },
+  "ui5": {
+    "dependencies": [
+      "@sap/ui5-builder-webide-extension"
+    ]
+  },
+  "private": true,
+  "sapuxLayer": "VENDOR",
+  "keywords": [
+    "ui5",
+    "openui5",
+    "sapui5"
+  ],
+  "main": "webapp/index.html"
+}

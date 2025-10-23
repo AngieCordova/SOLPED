@@ -1,0 +1,2 @@
+jQuery.sap.declare("customer.zmyinboxsolped.Component");sap.ui.component.load({name:"cross.fnd.fiori.inbox",url:"/sap/bc/ui5_ui5/sap/CA_FIORI_INBOX"});cross.fnd.fiori.inbox.Component.extend("customer.zmyinboxsolped.Component",{metadata:{manifest:"json"}});
+//# sourceMappingURL=Component.js.map

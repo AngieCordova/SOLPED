@@ -1,0 +1,32 @@
+specVersion: "2.6"
+metadata:
+  name: customer.zmyinboxsolped
+type: application
+server:
+  customMiddleware:
+    - name: fiori-tools-proxy
+      afterMiddleware: compression
+      configuration:
+        ignoreCertError: false
+        backend:
+          - path: /sap
+            url: https://fioris4dev.sap.divisionminera.com
+            client: "110"
+            destination: Fiori_DEV_110
+        ui5:
+          path:
+            - /resources
+            - /test-resources
+          url: https://ui5.sap.com
+          version: "1.120.23"
+    - name: fiori-tools-appreload
+      afterMiddleware: compression
+      configuration:
+        port: 35729
+        path: webapp
+        delay: 300
+    - name: fiori-tools-preview
+      afterMiddleware: fiori-tools-appreload
+      configuration:
+        component: customer.zmyinboxsolped
+        ui5Theme: sap_fiori_3        

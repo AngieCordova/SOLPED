@@ -1,0 +1,86 @@
+{
+	"_version": "1.1.0",
+	"sap.app": {
+		"_version": "1.1.0",
+		"id": "customer.zmyinboxsolped",
+		"type": "application",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"title": "{{SHELL_TITLE}}",
+		"sourceTemplate": {
+			"id": "generator-extensibilty-sub",
+			"version": "1.0.0"
+		},
+		"dataSources": {
+			"Z_MM_WF_SOLPED_SRV": {
+				"uri": "/sap/opu/odata/sap/Z_MM_WF_SOLPED_SRV/",
+				"type": "OData",
+				"settings": {
+					"annotations": [],
+					"localUri": "localService/Z_MM_WF_SOLPED_SRV/metadata.xml",
+					"odataVersion": "2.0"
+				}
+			}
+		}
+	},
+	"sap.ui": {
+		"_version": "1.1.0",
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://approvals",
+			"favIcon": "./resources/sap/ca/ui/themes/base/img/favicon/Approve_Requests.ico"
+		},
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		},
+		"supportedThemes": [
+			"sap_hcb",
+			"sap_bluecrystal"
+		]
+	},
+	"sap.ui5": {
+		"_version": "1.1.0",
+		"dependencies": {
+			"minUI5Version": "1.114.2"
+		},
+		"extends": {
+			"component": "cross.fnd.fiori.inbox",
+			"extensions": {
+				"sap.ui.controllerExtensions": {
+					"cross.fnd.fiori.inbox.view.S3": {
+						"controllerName": "customer.zmyinboxsolped.view.S3Custom"
+					},
+					"cross.fnd.fiori.inbox.view.S2": {
+						"controllerName": "customer.zmyinboxsolped.view.S2Custom"
+					}
+				},
+				"sap.ui.viewReplacements": {
+					"cross.fnd.fiori.inbox.view.S3": {
+						"viewName": "customer.zmyinboxsolped.view.S3Custom",
+						"type": "XML"
+					}
+				}
+			}
+		},
+		"contentDensities": {
+			"compact": true,
+			"cozy": true
+		},
+		"models": {
+			"Z_MM_WF_SOLPED_SRV": {
+				"type": "sap.ui.model.odata.v2.ODataModel",
+				"dataSource": "Z_MM_WF_SOLPED_SRV",
+				"preload": true,
+				"settings": {
+					"defaultOperationMode": "Server",
+					"defaultBindingMode": "OneWay",
+					"defaultCountMode": "Inline",
+					"useBatch": false
+				}
+			}
+		}
+	}
+}
